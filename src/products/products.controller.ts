@@ -1,18 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ParseUUIDPipe, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, UploadedFiles } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductImagesService } from './product-images.service';
-import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/auth/entities';
 import { GetUser } from 'src/auth/decorators';
 import { PaginationDto } from 'src/common/dto';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { DeleteFileDto, DeleteFilesDto } from './dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { DeleteFileDto, DeleteFilesDto, UpdateOptionsDto, CreateProductDto, UpdateProductDto, SupplierQueryDto } from './dto';
+import { JwtAuthGuard } from 'src/auth/guards';
 
 // localhost:3000/api/products
 @Controller('products')
-@UseGuards( AuthGuard() )
+@UseGuards( JwtAuthGuard )
 export class ProductsController {
 
   constructor(
@@ -21,14 +19,26 @@ export class ProductsController {
     private readonly productImagesService: ProductImagesService, 
   ) {}
 
+  //*NO usar para graficar
   @Post('create') // localhost:3000/api/products/create - POST
+  @UseInterceptors( FilesInterceptor('file[]', 6) )
   createProduct(
     @Body() createProductDto: CreateProductDto,
-    @GetUser() user: User
+    @GetUser() user: User,
+    @Query() supplierQueryDto: SupplierQueryDto,
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4 megabytes
+          new FileTypeValidator({ fileType: '.(jpg|png|jpeg)' }), // extensions
+        ]
+      }),
+    ) files: Express.Multer.File[],
   ) {
-    return this.productsService.createProduct( createProductDto, user );
+    return this.productsService.createProduct( createProductDto, user, supplierQueryDto, files );
   }
 
+  //*SI usar para graficar
   @Get('find') // localhost:3000/api/products/find - GET
   findAllProducts(
     @Query() paginationDto: PaginationDto,
@@ -37,6 +47,7 @@ export class ProductsController {
     return this.productsService.findAllProducts( paginationDto, user );
   }
 
+  //*SI usar para graficar
   @Get('find/:id') // localhost:3000/api/products/find/:id - GET
   findProductByTerm(
     @Param('id', ParseUUIDPipe ) id: string,
@@ -44,12 +55,23 @@ export class ProductsController {
     return this.productsService.findProductByTerm( id );
   }
 
+  //*NO usar para graficar
   @Patch(':id') // localhost:3000/api/products/:id - PATCH
+  @UseInterceptors( FilesInterceptor('file[]', 6) )
   updateProduct(
     @Param('id', ParseUUIDPipe ) id: string,
-    @Body() updateProductDto: UpdateProductDto
+    @Body() updateProductDto: UpdateProductDto,
+    @Query() updateOptionsDto: UpdateOptionsDto,
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4 megabytes
+          new FileTypeValidator({ fileType: '.(jpg|png|jpeg)' }), // extensions
+        ]
+      }),
+    ) files: Express.Multer.File[],
   ) {
-    return this.productsService.updateProduct( id, updateProductDto );
+    return this.productsService.updateProduct( id, updateProductDto, files, updateOptionsDto );
   }
 
   @Delete(':id') // localhost:3000/api/products/:id - DELETE
@@ -58,39 +80,6 @@ export class ProductsController {
   ) {
     return this.productsService.deleteProduct( id );
   }
-
-  //* images?
-  @Post('file/:id')  // localhost:3000/api/products/file/:id - POST
-  @UseInterceptors( FileInterceptor('file') )
-  uploadSingleProductImage( 
-    @Param('id', ParseUUIDPipe ) id: string,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4 megabytes
-          new FileTypeValidator({ fileType: '.(jpg|png|jpeg)' }), // extensions
-        ]
-      }),
-    ) file: Express.Multer.File,   
-  ) {
-    return this.productImagesService.createProductWithSingleImage( id, file );
-  } 
-
-  @Post('files/:id')  // localhost:3000/api/products/files/:id - POST
-  @UseInterceptors( FilesInterceptor('file[]', 5) ) //hasta 5 archivos
-  uploadMultipleProductImages( 
-    @Param('id', ParseUUIDPipe ) id: string,
-    @UploadedFiles(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4 megabytes
-          new FileTypeValidator({ fileType: '.(jpg|png|jpeg)' }), // extensions
-        ]
-      }),
-    ) files: Express.Multer.File[],   
-  ) {
-    return this.productImagesService.createProductWithMultipleImages( id, files );
-  } 
 
   @Delete('files/delete-file') // localhost:3000/api/products/files/delete-file - DELETE
   deleteSingleImageBySecureURL(
@@ -113,14 +102,6 @@ export class ProductsController {
     return this.productImagesService.findImageBySecureUrl( id );
   }
 
-  @Get('files/by-secure-url') // localhost:3000/api/products/files/by-secure-url - GET
-  findImageByUrl(
-    @Body() deleteFileDto: DeleteFileDto
-  ) {
-    const { secureUrl } = deleteFileDto;
-    return this.productImagesService.findImageBySecureUrl( secureUrl );
-  }
-
   @Get('files/all/:id') // localhost:3000/api/products/files/all/:id - GET
   findAllImagesOfProduct(
     @Param('id', ParseUUIDPipe ) id: string, //idProduct
@@ -130,3 +111,36 @@ export class ProductsController {
   }
 
 }
+
+
+  // @Post('file/:id')  // localhost:3000/api/products/file/:id - POST
+  // @UseInterceptors( FileInterceptor('file') )
+  // uploadSingleProductImage( 
+  //   @Param('id', ParseUUIDPipe ) id: string,
+  //   @UploadedFile(
+  //     new ParseFilePipe({
+  //       validators: [
+  //         new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4 megabytes
+  //         new FileTypeValidator({ fileType: '.(jpg|png|jpeg)' }), // extensions
+  //       ]
+  //     }),
+  //   ) file: Express.Multer.File,   
+  // ) {
+  //   return this.productImagesService.createProductWithSingleImage( id, file );
+  // } 
+
+  // @Post('files/:id')  // localhost:3000/api/products/files/:id - POST
+  // @UseInterceptors( FilesInterceptor('file[]', 5) ) //hasta 5 archivos
+  // uploadMultipleProductImages( 
+  //   @Param('id', ParseUUIDPipe ) id: string,
+  //   @UploadedFiles(
+  //     new ParseFilePipe({
+  //       validators: [
+  //         new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }), // 4 megabytes
+  //         new FileTypeValidator({ fileType: '.(jpg|png|jpeg)' }), // extensions
+  //       ]
+  //     }),
+  //   ) files: Express.Multer.File[],   
+  // ) {
+  //   return this.productImagesService.createProductWithMultipleImages( id, files );
+  // } 

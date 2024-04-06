@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto';
 import { GetUser } from './decorators';
 import { User } from './entities';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from './guards';
 
 // localhost:3000/api/auth
 @Controller('auth')
@@ -31,7 +31,7 @@ export class AuthController {
 
   // localhost:3000/api/auth/check-auth-status - GET
   @Get('check-auth-status')
-  @UseGuards( AuthGuard() )
+  @UseGuards( JwtAuthGuard )
   async checkAuthStatus(
     @GetUser() user: User
   ) {
@@ -40,7 +40,7 @@ export class AuthController {
 
   // localhost:3000/api/auth/find/:id - GET
   @Get('find/:id')
-  @UseGuards( AuthGuard() )
+  @UseGuards( JwtAuthGuard )
   async findUserByIdOrEmail(
     @Param('id', ParseUUIDPipe ) id: string,
   ) {
@@ -49,7 +49,7 @@ export class AuthController {
 
   // localhost:3000/api/auth/:id - PATCH
   @Patch(':id')
-  @UseGuards( AuthGuard() )
+  @UseGuards( JwtAuthGuard )
   async updateUser(
     @Param('id', ParseUUIDPipe ) id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -59,7 +59,7 @@ export class AuthController {
 
   // localhost:3000/api/auth/:id - DELETE
   @Delete(':id')
-  @UseGuards( AuthGuard() )
+  @UseGuards( JwtAuthGuard )
   async deleteUser(
     @Param('id', ParseUUIDPipe ) id: string,
   ) {

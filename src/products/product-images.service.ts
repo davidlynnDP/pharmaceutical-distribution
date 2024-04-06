@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException, forwardRef } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 import { validate as isUUID } from 'uuid'; 
@@ -10,9 +10,6 @@ import { DeleteFileDto, DeleteFilesDto } from "./dto";
 import { PaginationDto } from "src/common/dto";
 
 
-
-
-
 @Injectable()
 export class ProductImagesService {
 
@@ -22,9 +19,9 @@ export class ProductImagesService {
 
         private readonly cloudinaryService: CloudinaryService,
 
+        @Inject(forwardRef(() => ProductsService))
         private readonly productsService: ProductsService,
       ) {}
-
 
     async createProductWithMultipleImages( id: string, files: Express.Multer.File[] ) {
 
@@ -87,9 +84,27 @@ export class ProductImagesService {
       return await this.productImageRepository.save( productImages );  
     }
 
+
+    async deleteProductImages( id: string ) {
+
+      const product = await this.productsService.findProductByTerm( id );
+
+      for (const image of product.images) {
+
+        const imageId = this.cloudinaryService.getIdFromSecureURL( image.url ); //url
+        await this.cloudinaryService.deleteSingleFile( imageId );
+        
+        await this.productImageRepository.delete( image.id );
+      }
+
+      return `Deletion of product images with id ${ product.id } successful`;
+
+    }
+
+
     async deleteSingleImage( deleteFileDto: DeleteFileDto ): Promise<string> {
 
-      const { secureUrl } = deleteFileDto;
+      const { secureUrl } = deleteFileDto; 
 
       try {
 
@@ -136,7 +151,7 @@ export class ProductImagesService {
     }
 
 
-    async findImageBySecureUrl( secureUrl: string ): Promise<ProductImage> {
+    async findImageBySecureUrl( secureUrl: string ) {
 
       let image: ProductImage;
 

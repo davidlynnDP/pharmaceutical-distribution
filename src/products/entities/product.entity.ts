@@ -56,7 +56,7 @@ export class Product {
     @OneToMany( 
         () => ProductImage,
         ( productImage ) => productImage.product, 
-        /* opciones */
+        { cascade: true, eager: true }
     )
     images?: ProductImage[];
 
@@ -78,7 +78,7 @@ export class Product {
     @BeforeUpdate() 
     checkSlugUpdate() {
 
-        this.slug = this.slug
+        this.slug = this.name
             .toLowerCase()
             .replaceAll(' ','_')
             .replaceAll("'",'')

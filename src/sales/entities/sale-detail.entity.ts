@@ -13,16 +13,13 @@ export class SaleDetail {
     quantity: number;
 
     @Column()
-    unitPrice: number;
-
-    @Column()
     total: number; // (quantity * unitPrice).
 
     
     @ManyToOne(
         () => Product,
         ( product ) => product.saleDetails,
-        /* opciones */
+        { eager: true }
     )
     product: Product;
 
@@ -36,12 +33,12 @@ export class SaleDetail {
 
     @BeforeInsert()
     calculateTotalInsert() {
-        this.total = this.quantity * this.unitPrice;
+        //this.total = this.quantity * this.unitPrice;
     }
     
     @BeforeUpdate()
     calculateTotalUpdate() {
-        this.total = this.quantity * this.unitPrice;
+        //this.total = this.quantity * this.unitPrice;
     }
 
 }

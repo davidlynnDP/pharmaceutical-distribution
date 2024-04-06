@@ -5,11 +5,11 @@ import { UpdateClientDto } from './dto/update-client.dto';
 import { GetUser } from 'src/auth/decorators';
 import { User } from 'src/auth/entities';
 import { PaginationDto } from 'src/common/dto';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/guards';
 
 
 @Controller('clients') // localhost:3000/api/clients
-@UseGuards( AuthGuard() )
+@UseGuards( JwtAuthGuard )
 export class ClientsController {
 
   constructor(
@@ -22,7 +22,7 @@ export class ClientsController {
     @Body() createClientDto: CreateClientDto, 
     @GetUser() user: User
   ) {
-    return await this.clientsService.createClient( createClientDto, user);
+    return await this.clientsService.createClient( createClientDto, user );
   }
 
   // localhost:3000/api/clients/find - GET

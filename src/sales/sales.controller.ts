@@ -1,34 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Query, ParseUUIDPipe } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
-import { UpdateSaleDto } from './dto/update-sale.dto';
+import { JwtAuthGuard } from 'src/auth/guards';
+import { GetUser } from 'src/auth/decorators';
+import { User } from 'src/auth/entities';
+import { PaginationDto } from 'src/common/dto';
+import { ClientQueryDto } from './dto';
 
-@Controller('sales')
+@Controller('sales') //localhost:3000/api/sales
+@UseGuards( JwtAuthGuard )
 export class SalesController {
-  constructor(private readonly salesService: SalesService) {}
+  
+  constructor(
+    private readonly salesService: SalesService
+  ) {}
 
-  @Post()
-  create(@Body() createSaleDto: CreateSaleDto) {
-    return this.salesService.create(createSaleDto);
+  // localhost:3000/api/sales/create - POST
+  @Post('create')
+  async createSale(
+    @Body() createSaleDto: CreateSaleDto,
+    @GetUser() user: User,
+    @Query() clientQueryDto: ClientQueryDto,
+  ) {
+    return await this.salesService.createSale( createSaleDto, user, clientQueryDto );
   }
 
-  @Get()
-  findAll() {
-    return this.salesService.findAll();
+  // localhost:3000/api/sales/find - GET
+  @Get('find')
+  async findAllSales(
+    @Query() paginationDto: PaginationDto,
+    @GetUser() user: User
+  ) {
+    return await this.salesService.findAllSales( paginationDto, user );
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.salesService.findOne(+id);
+  // localhost:3000/api/sales/find/:id - GET
+  @Get('find/:id')
+  async findSaleById(
+    @Param('id', ParseUUIDPipe ) id: string,
+  ) {
+    return await this.salesService.findSaleById( id );
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
-    return this.salesService.update(+id, updateSaleDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.salesService.remove(+id);
-  }
 }

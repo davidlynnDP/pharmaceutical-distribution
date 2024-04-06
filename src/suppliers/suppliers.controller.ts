@@ -1,16 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ParseUUIDPipe } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-
 import { SuppliersService } from './suppliers.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { GetUser } from 'src/auth/decorators';
 import { User } from 'src/auth/entities';
 import { PaginationDto } from 'src/common/dto';
+import { JwtAuthGuard } from 'src/auth/guards';
 
 
 @Controller('suppliers') // localhost:3000/api/suppliers
-@UseGuards( AuthGuard() )
+@UseGuards( JwtAuthGuard )
 export class SuppliersController {
 
   constructor(
