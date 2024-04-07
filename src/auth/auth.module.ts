@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './strategies';
 import { jwtConstants } from 'src/constants';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
   controllers: [ AuthController ],
@@ -24,6 +25,8 @@ import { jwtConstants } from 'src/constants';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '2h' },
     }),
+
+    CommonModule
     
   ],
   exports: [

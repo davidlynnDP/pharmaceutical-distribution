@@ -8,6 +8,7 @@ import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { Supplier } from './entities';
 import { User } from 'src/auth/entities';
 import { PaginationDto } from 'src/common/dto';
+import { CommonService } from 'src/common/common.service';
 
 
 @Injectable()
@@ -17,6 +18,8 @@ export class SuppliersService {
   constructor(
     @InjectRepository(Supplier)
     private readonly supplierRepository: Repository<Supplier>, 
+
+    private readonly commonService: CommonService
   ) {}
 
 
@@ -32,7 +35,7 @@ export class SuppliersService {
       return await this.supplierRepository.save( supplier );  
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
   }
 
@@ -90,7 +93,7 @@ export class SuppliersService {
       return await this.supplierRepository.save( supplier );  
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
   }
 
@@ -105,24 +108,9 @@ export class SuppliersService {
       return `Successful supplier removal`;
       
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
     
-  }
-
-  async deleteAllSuppliers() {
-
-    const query = this.supplierRepository.createQueryBuilder('supplier'); 
-
-    try {
-      return await query
-        .delete()
-        .where({})  
-        .execute();
-
-    } catch ( error ) {
-      console.log( error );
-    }
   }
   
 }

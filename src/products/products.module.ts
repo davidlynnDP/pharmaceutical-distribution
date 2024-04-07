@@ -9,6 +9,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { SuppliersModule } from 'src/suppliers/suppliers.module';
+import { CommonModule } from 'src/common/common.module';
 
 
 @Module({
@@ -21,6 +22,7 @@ import { SuppliersModule } from 'src/suppliers/suppliers.module';
     AuthModule,
     JwtModule,
     SuppliersModule,
+    CommonModule
   ],
   exports: [
     TypeOrmModule,

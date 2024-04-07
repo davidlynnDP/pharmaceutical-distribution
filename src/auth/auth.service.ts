@@ -9,6 +9,7 @@ import { validate as isUUID } from 'uuid';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto';
 import { User } from './entities';
 import { JwtPayload } from './interfaces';
+import { CommonService } from 'src/common/common.service';
 
 
 @Injectable()
@@ -17,6 +18,8 @@ export class AuthService {
   constructor(
     @InjectRepository( User )
     private readonly userRepository: Repository<User>,
+
+    private readonly commonService: CommonService,
 
     private readonly jwtService: JwtService, 
 
@@ -46,7 +49,7 @@ export class AuthService {
       };
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
   }
 
@@ -133,17 +136,17 @@ export class AuthService {
 
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
 
   }
 
   async deleteUser( id: string ) {
 
-    const user = await this.userRepository.findOneBy({ id: id });
+    const user = await this.userRepository.findOneBy({ id });
 
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
+    if ( !user ) {
+      throw new NotFoundException(`User with id ${ id } not found`);
     }
   
     user.isActive = false;
@@ -153,18 +156,4 @@ export class AuthService {
     return user;
   }
 
-
-  async deleteAllUsers() {
-    const query = this.userRepository.createQueryBuilder();  
-
-    try {
-      return await query
-        .delete()
-        .where({})   
-        .execute();
-
-    } catch ( error ) {
-      console.log( error ); 
-    }
-  }
 }

@@ -6,6 +6,7 @@ import { Supplier } from './entities';
 import { PassportModule } from '@nestjs/passport';
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
   controllers: [ SuppliersController ],
@@ -15,6 +16,7 @@ import { JwtModule } from '@nestjs/jwt';
     PassportModule,
     AuthModule,
     JwtModule,
+    CommonModule
   ],
   exports: [
     TypeOrmModule,

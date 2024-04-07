@@ -8,6 +8,7 @@ import { UpdateClientDto } from './dto/update-client.dto';
 import { Client } from './entities';
 import { User } from 'src/auth/entities';
 import { PaginationDto } from 'src/common/dto';
+import { CommonService } from 'src/common/common.service';
 
 
 @Injectable()
@@ -16,8 +17,9 @@ export class ClientsService {
   constructor(
 
     @InjectRepository( Client )
-    private readonly clientRepository: Repository<Client>
-     
+    private readonly clientRepository: Repository<Client>,
+
+    private readonly commonService: CommonService
   ) {}
 
 
@@ -33,7 +35,7 @@ export class ClientsService {
       return await this.clientRepository.save( client );  
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
 
   }
@@ -92,7 +94,7 @@ export class ClientsService {
       return await this.clientRepository.save( client );  
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
   }
 
@@ -107,23 +109,9 @@ export class ClientsService {
       return `Successful client removal`;
       
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
     
   }
 
-  async deleteAllClients() {
-
-    const query = this.clientRepository.createQueryBuilder('client'); 
-
-    try {
-      return await query
-        .delete()
-        .where({})  
-        .execute();
-
-    } catch ( error ) {
-      console.log( error );
-    }
-  }
 }

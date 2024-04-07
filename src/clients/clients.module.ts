@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
   controllers: [ ClientsController ],
@@ -14,7 +15,8 @@ import { JwtModule } from '@nestjs/jwt';
     TypeOrmModule.forFeature([ Client ]),
     PassportModule,
     AuthModule,
-    JwtModule
+    JwtModule,
+    CommonModule
   ],
   exports: [
     TypeOrmModule,

@@ -11,6 +11,7 @@ import { PaginationDto } from 'src/common/dto';
 import { SupplierQueryDto, UpdateOptionsDto } from './dto';
 import { ProductImagesService } from './product-images.service';
 import { SuppliersService } from 'src/suppliers/suppliers.service';
+import { CommonService } from 'src/common/common.service';
 
 
 @Injectable()
@@ -24,7 +25,9 @@ export class ProductsService {
     @Inject(forwardRef(() => ProductImagesService))
     private readonly productImagesService: ProductImagesService, 
 
-    private readonly suppliersService: SuppliersService
+    private readonly suppliersService: SuppliersService,
+
+    private readonly commonService: CommonService
   ) {}
 
   async createProduct( createProductDto: CreateProductDto, user: User, supplierQueryDto: SupplierQueryDto, files: Express.Multer.File[] ) {
@@ -50,7 +53,7 @@ export class ProductsService {
     return await this.productRepository.save( savedProduct );
       
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
   }
 
@@ -158,7 +161,7 @@ export class ProductsService {
       return await this.productRepository.save( product );
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
   }
 
@@ -184,7 +187,7 @@ export class ProductsService {
       return `Successful product removal`;
       
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
     
   }

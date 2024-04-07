@@ -6,6 +6,8 @@ import { Supplier } from 'src/suppliers/entities';
 import { Product } from 'src/products/entities';
 import { Client } from 'src/clients/entities';
 import { initialInformation } from './information';
+import { Sale } from 'src/sales/entities';
+import { CommonService } from 'src/common/common.service';
 
 @Injectable()
 export class SeedService {
@@ -22,6 +24,11 @@ export class SeedService {
 
     @InjectRepository(Supplier)
     private readonly supplierRepository: Repository<Supplier>, 
+
+    @InjectRepository(Sale)
+    private readonly saleRepository: Repository<Sale>, 
+
+    private readonly commonService: CommonService
   ) {}
   
   async loadInformationToDatabase() {
@@ -39,7 +46,7 @@ export class SeedService {
       return 'Database seeding completed successfully.'
 
   } catch ( error ) {
-      console.log( error );
+    this.commonService.globalErrorHandler( error );
   }
 
   }
@@ -92,6 +99,7 @@ export class SeedService {
 
   private async deleteAllTables() {
 
+    await this.deleteAllSales();
     await this.deleteAllProducts();
     await this.deleteAllClients();
     await this.deleteAllSuppliers();
@@ -109,7 +117,7 @@ export class SeedService {
         .execute();
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
   }
 
@@ -123,7 +131,7 @@ export class SeedService {
         .execute();
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
   }
 
@@ -137,7 +145,7 @@ export class SeedService {
         .execute();
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
   }
 
@@ -151,7 +159,21 @@ export class SeedService {
         .execute();
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
+    }
+  }
+
+  private async deleteAllSales() {
+    const query = this.saleRepository.createQueryBuilder('sale'); 
+
+    try {
+      return await query
+        .delete()
+        .where({})  
+        .execute();
+
+    } catch ( error ) {
+      this.commonService.globalErrorHandler( error );
     }
   }
 }

@@ -9,6 +9,7 @@ import { SaleDetailsService } from './sale-details.service';
 import { ProductsModule } from 'src/products/products.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
   controllers: [ SalesController ],
@@ -19,7 +20,8 @@ import { JwtModule } from '@nestjs/jwt';
     AuthModule,
     JwtModule,
     ClientsModule,
-    ProductsModule
+    ProductsModule,
+    CommonModule
   ],
   exports: [
     TypeOrmModule

@@ -53,7 +53,7 @@ export class AuthController {
   async updateUser(
     @Param('id', ParseUUIDPipe ) id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<User> {
+  ) {
     return await this.authService.updateUser( id, updateUserDto );
   }
 

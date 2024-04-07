@@ -8,6 +8,7 @@ import { CloudinaryService } from "src/cloudinary/cloudinary.service";
 import { ProductsService } from "./products.service";
 import { DeleteFileDto, DeleteFilesDto } from "./dto";
 import { PaginationDto } from "src/common/dto";
+import { CommonService } from "src/common/common.service";
 
 
 @Injectable()
@@ -21,6 +22,8 @@ export class ProductImagesService {
 
         @Inject(forwardRef(() => ProductsService))
         private readonly productsService: ProductsService,
+
+        private readonly commonService: CommonService
       ) {}
 
     async createProductWithMultipleImages( id: string, files: Express.Multer.File[] ) {
@@ -119,7 +122,7 @@ export class ProductImagesService {
         return `Product image successfully removed`
         
       } catch ( error ) {
-        console.log( error );
+        this.commonService.globalErrorHandler( error );
       }
 
     }
@@ -145,7 +148,7 @@ export class ProductImagesService {
         return `Product images successfully removed`;
         
       } catch ( error ) {
-        console.log( error );
+        this.commonService.globalErrorHandler( error );
       }
 
     }
@@ -187,21 +190,6 @@ export class ProductImagesService {
         id,
         url
       }))
-    }
-
-
-    async deleteAllImages() {
-      const query = this.productImageRepository.createQueryBuilder('productImage'); 
-
-      try {
-        return await query
-          .delete()
-          .where({})  
-          .execute();
-          
-      } catch ( error ) {
-        console.log( error );
-      }
     }
 
 }

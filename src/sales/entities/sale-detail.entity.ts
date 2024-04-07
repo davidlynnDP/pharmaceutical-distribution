@@ -1,5 +1,5 @@
 import { Product } from 'src/products/entities';
-import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Sale } from './sale.entity';
 
 
@@ -26,19 +26,8 @@ export class SaleDetail {
     @ManyToOne(
         () => Sale,
         ( sale ) => sale.saleDetails,
-        /* opciones */
+        { onDelete: 'CASCADE' }  
     )
     sale: Sale;
-
-
-    @BeforeInsert()
-    calculateTotalInsert() {
-        //this.total = this.quantity * this.unitPrice;
-    }
-    
-    @BeforeUpdate()
-    calculateTotalUpdate() {
-        //this.total = this.quantity * this.unitPrice;
-    }
 
 }

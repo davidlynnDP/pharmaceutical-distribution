@@ -8,6 +8,7 @@ import { User } from 'src/auth/entities';
 import { PaginationDto } from 'src/common/dto';
 import { validate as isUUID } from 'uuid'; 
 import { SaleDetailsService } from './sale-details.service';
+import { CommonService } from 'src/common/common.service';
 
 
 @Injectable()
@@ -21,6 +22,8 @@ export class SalesService {
     private readonly saleDetailsService: SaleDetailsService,
     
     private readonly clientsService: ClientsService,
+
+    private readonly commonService: CommonService
   ) {}
 
   async createSale( createSaleDto: CreateSaleDto, user: User, clientQueryDto: ClientQueryDto ) {
@@ -46,7 +49,7 @@ export class SalesService {
       return 'Sale created';
 
     } catch ( error ) {
-      console.log( error );
+      this.commonService.globalErrorHandler( error );
     }
 
   }

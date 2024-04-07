@@ -13,22 +13,22 @@ export class UpdateSupplierDto {
 
     @IsOptional()
     @IsString()
-    @Length(1, 255) // Limita la longitud del address a entre 1 y 255 caracteres
+    @Length(1, 255) 
     address?: string;
 
     @IsOptional()
     @IsString()
-    @Length(1, 100) // Limita la longitud de city a entre 1 y 100 caracteres
+    @Length(1, 100) 
     city?: string;
 
     @IsOptional()
     @IsString()
-    @Length(1, 100) // Limita la longitud de country a entre 1 y 100 caracteres
+    @Length(1, 100) 
     country?: string;
 
     @IsOptional()
     @IsString()
-    @Length(1, 20) // Limita la longitud de postalCode a entre 1 y 20 caracteres
+    @Length(1, 20)
     postalCode?: string;
 
 }
