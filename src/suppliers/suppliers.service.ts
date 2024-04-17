@@ -32,7 +32,9 @@ export class SuppliersService {
         user
       });
       
-      return await this.supplierRepository.save( supplier );  
+      await this.supplierRepository.save( supplier );
+      
+      return 'Supplier created successfully';
 
     } catch ( error ) {
       this.commonService.globalErrorHandler( error );
@@ -90,7 +92,9 @@ export class SuppliersService {
         ...updateSupplierDto, 
       });
 
-      return await this.supplierRepository.save( supplier );  
+      await this.supplierRepository.save( supplier );  
+
+      return 'Supplier successfully updated';
 
     } catch ( error ) {
       this.commonService.globalErrorHandler( error );
@@ -105,7 +109,7 @@ export class SuppliersService {
     try {
       await this.supplierRepository.remove( product );
 
-      return `Successful supplier removal`;
+      return 'Supplier successfully removed';
       
     } catch ( error ) {
       this.commonService.globalErrorHandler( error );

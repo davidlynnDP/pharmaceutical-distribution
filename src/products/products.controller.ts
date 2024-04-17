@@ -15,11 +15,8 @@ export class ProductsController {
 
   constructor(
     private readonly productsService: ProductsService,
-
-    private readonly productImagesService: ProductImagesService, 
   ) {}
 
-  //*NO usar para graficar
   @Post('create') // localhost:3000/api/products/create - POST
   @UseInterceptors( FilesInterceptor('files', 6) )
   createProduct(
@@ -38,7 +35,6 @@ export class ProductsController {
     return this.productsService.createProduct( createProductDto, user, supplierQueryDto, files );
   }
 
-  //*SI usar para graficar
   @Get('find') // localhost:3000/api/products/find - GET
   findAllProducts(
     @Query() paginationDto: PaginationDto,
@@ -47,7 +43,6 @@ export class ProductsController {
     return this.productsService.findAllProducts( paginationDto, user );
   }
 
-  //*SI usar para graficar
   @Get('find/:id') // localhost:3000/api/products/find/:id - GET
   findProductByTerm(
     @Param('id', ParseUUIDPipe ) id: string,
@@ -55,7 +50,6 @@ export class ProductsController {
     return this.productsService.findProductByTerm( id );
   }
 
-  //*NO usar para graficar
   @Patch(':id') // localhost:3000/api/products/:id - PATCH
   @UseInterceptors( FilesInterceptor('files', 6) )
   updateProduct(

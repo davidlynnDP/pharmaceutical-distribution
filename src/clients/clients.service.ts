@@ -32,7 +32,9 @@ export class ClientsService {
         user
       });
       
-      return await this.clientRepository.save( client );  
+      await this.clientRepository.save( client );  
+
+      return 'Successfully created client';
 
     } catch ( error ) {
       this.commonService.globalErrorHandler( error );
@@ -91,7 +93,9 @@ export class ClientsService {
         ...updateclientDto, 
       });
 
-      return await this.clientRepository.save( client );  
+      await this.clientRepository.save( client );  
+
+      return 'Successfully updated client';
 
     } catch ( error ) {
       this.commonService.globalErrorHandler( error );
@@ -106,7 +110,7 @@ export class ClientsService {
     try {
       await this.clientRepository.remove( client );
 
-      return `Successful client removal`;
+      return `Successfully deleted client`;
       
     } catch ( error ) {
       this.commonService.globalErrorHandler( error );

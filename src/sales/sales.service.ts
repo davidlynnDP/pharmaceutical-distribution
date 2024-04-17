@@ -46,7 +46,7 @@ export class SalesService {
         await this.saleRepository.save( savedSale );
       }
 
-      return 'Sale created';
+      return 'Sale created successfully';
 
     } catch ( error ) {
       this.commonService.globalErrorHandler( error );

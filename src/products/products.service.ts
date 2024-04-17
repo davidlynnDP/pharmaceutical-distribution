@@ -50,7 +50,9 @@ export class ProductsService {
         savedProduct.images = images;
     }
 
-    return await this.productRepository.save( savedProduct );
+    await this.productRepository.save( savedProduct );
+
+    return 'Successfully created product';
       
     } catch ( error ) {
       this.commonService.globalErrorHandler( error );
@@ -92,7 +94,6 @@ export class ProductsService {
     let product: Product;
 
     if ( isUUID( term ) ) {
-      //product = await this.productRepository.findOneBy({ id: term });
       product = await this.productRepository.findOne({
         where: {
           id: term
@@ -146,10 +147,12 @@ export class ProductsService {
           id,
           ...updateProductDto,
           images,
-          supplier: supplierTo //probar - puede ser undefined
+          supplier: supplierTo
         });
 
-        return await this.productRepository.save(product);
+        await this.productRepository.save( product );
+
+        return 'Successfully updated product';
       }
 
       const product = await this.productRepository.preload({
@@ -158,7 +161,9 @@ export class ProductsService {
         supplier: supplierTo
       });
 
-      return await this.productRepository.save( product );
+      await this.productRepository.save( product );
+
+      return 'Successfully updated product';
 
     } catch ( error ) {
       this.commonService.globalErrorHandler( error );
@@ -174,7 +179,10 @@ export class ProductsService {
       ...product
     });
 
-    return await this.productRepository.save( productTo );
+    await this.productRepository.save( productTo );
+
+    return 'Successfully updated product';
+
   }
 
   async deleteProduct( id: string ) {
@@ -184,7 +192,7 @@ export class ProductsService {
     try {
       await this.productRepository.remove( product );
 
-      return `Successful product removal`;
+      return `Successfully deleted product`;
       
     } catch ( error ) {
       this.commonService.globalErrorHandler( error );

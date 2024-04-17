@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt'; 
 import { validate as isUUID } from 'uuid';
 
@@ -22,8 +22,6 @@ export class AuthService {
     private readonly commonService: CommonService,
 
     private readonly jwtService: JwtService, 
-
-    private readonly dataSource: DataSource,
   ) {}
 
   
@@ -34,7 +32,6 @@ export class AuthService {
       const { password, ...userData } = createUserDto;
       const salt = bcrypt.genSaltSync( 10 );
 
-      
       const user = this.userRepository.create({ 
         ...userData,
         password: bcrypt.hashSync( password, salt ) 
@@ -108,37 +105,24 @@ export class AuthService {
     return user;
   }
 
-
   async updateUser( id: string, updateUserDto: UpdateUserDto ) {
-
-    const user = await this.userRepository.preload({ 
-      id, 
-      ...updateUserDto 
-    }); 
-
-    if ( !user ) throw new NotFoundException(`User with id: ${ id } not found`);
-
-    const queryRunner = this.dataSource.createQueryRunner();
-
-    await queryRunner.connect();              
-    await queryRunner.startTransaction(); 
+    
+    await this.findUserByIdOrEmail( id );
 
     try {
 
-      await queryRunner.manager.save( user );  
+      const user = await this.userRepository.preload({ 
+        id, 
+        ...updateUserDto 
+      }); 
 
-      await queryRunner.commitTransaction();  
-      await queryRunner.release();  
+      await this.userRepository.save( user );  
 
-      return this.findUserByIdOrEmail( id );
-      
+      return 'Successfully updated user';
+
     } catch ( error ) {
-
-      await queryRunner.rollbackTransaction();
-      await queryRunner.release();
       this.commonService.globalErrorHandler( error );
     }
-
   }
 
   async deleteUser( id: string ) {
@@ -151,9 +135,9 @@ export class AuthService {
   
     user.isActive = false;
   
-    await this.userRepository.save( user );
-  
-    return user;
+    this.userRepository.save( user );
+
+    return 'Successfully deleted user (isActive:false)'
   }
 
 }

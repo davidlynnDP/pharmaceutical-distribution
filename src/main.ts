@@ -27,5 +27,8 @@ bootstrap();
 //docker-compose up -d
 //docker-compose -f docker-compose.prod.yml build
 //docker-compose -f docker-compose.prod.yml up
+//docker push dav1dlynn/pharmaceutical-distribution:latest
+
+//dav1dlynn/pharmaceutical-distribution:latest
 
 //docker buildx build --platform linux/amd64,linux/arm64 -t dav1dlynn/pharmaceutical-distribution --push .
