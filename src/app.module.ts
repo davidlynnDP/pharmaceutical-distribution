@@ -17,18 +17,12 @@ import { SeedModule } from './seed/seed.module';
     ConfigModule.forRoot(),
 
     TypeOrmModule.forRoot({
-      ssl: process.env.STAGE === 'prod',
-      extra: {
-        ssl: process.env.STAGE === 'prod'
-              ? { rejectUnauthorized: false }  
-              : null,
-      },
-      type: 'mysql',
-      host: process.env.MYSQL_HOST,
-      port: +process.env.MYSQL_PORT,
-      username: process.env.MYSQL_USERNAME,
-      password: process.env.MYSQL_PASSWORD,
-      database: process.env.MYSQL_DATABASE,
+      type: 'postgres',
+      host: process.env.STAGE === 'prod' ? process.env.POSTGRES_HOST : 'localhost',
+      port: +process.env.POSTGRES_PORT,
+      database: process.env.POSTGRES_DATABASE,
+      username: process.env.POSTGRES_USERNAME,
+      password: process.env.POSTGRES_PASSWORD,
       autoLoadEntities: true,
       synchronize: true,
     }),

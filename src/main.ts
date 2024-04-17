@@ -7,6 +7,8 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api'); // localhost:3000/api
 
+  app.enableCors();
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -23,3 +25,7 @@ async function bootstrap() {
 }
 bootstrap();
 //docker-compose up -d
+//docker-compose -f docker-compose.prod.yml build
+//docker-compose -f docker-compose.prod.yml up
+
+//docker buildx build --platform linux/amd64,linux/arm64 -t dav1dlynn/pharmaceutical-distribution --push .
